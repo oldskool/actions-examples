@@ -1,0 +1,33 @@
+---
+name: Assign user to a PR
+
+# SYNOPSIS
+#
+# This example shows you how to assign user(s) to a PR.
+# This example would assign "your-username" to
+# any PR targeted against the "assign-user" branch.
+#
+# We use the GITHUB_TOKEN secret to make GitHub Actions
+# call the GitHub API and change the assignees of this PR.
+
+on:
+  pull_request:
+    branches:
+    - assign-user
+
+jobs:
+  assign:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v1
+      
+      - name: Assign user
+        env:
+          API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        # Replace the assingees JSON array below with your desired username(s)
+        run: |
+          curl -H "Authorization: token ${API_TOKEN}" \
+          -X POST -d '{"assignees": ["your-username"]}' \
+          https://api.github.com/repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/assignees
